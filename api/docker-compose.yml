@@ -1,0 +1,12 @@
+custom-slideshow:
+  image: mysql:5.7
+  ports:
+    - 3306:3306
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: custom_slideshow
+    MYSQL_USER: user
+    MYSQL_PASSWORD: password
+    TZ: "Asia/Tokyo"
+  volumes:
+    - custom-slideshow:/var/lib/mysql/
