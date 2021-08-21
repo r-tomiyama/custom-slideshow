@@ -1,4 +1,15 @@
 import express from 'express'
+import * as mysql from 'promise-mysql'
+
+import { Dao } from './dao'
+
+const dbConfig: mysql.ConnectionConfig = {
+  host: '127.0.0.1',
+  database: 'custom_slideshow',
+  user: 'user',
+  password: 'password',
+  port: 3306,
+}
 
 const app: express.Express = express()
 app.use(express.json())
@@ -8,13 +19,18 @@ app.listen(3000, () => {
   console.log('Start on port 3000.')
 })
 
-type image = {
-  id: number
-  url: string
-}
+app.get('/images', async (req: express.Request, res: express.Response) => {
+  const connection = await mysql.createConnection(dbConfig)
+  const dao = new Dao(connection)
 
-const images: image[] = [{ id: 1, url: 'hoge.com' }]
-
-app.get('/images', (req: express.Request, res: express.Response) => {
-  res.send(JSON.stringify(images))
+  try {
+    const images = await dao.findAllImages()
+    console.log(images)
+    res.send(JSON.stringify(images))
+  } catch (e) {
+    console.error(e)
+    // TODO: エラーレスポンス
+  } finally {
+    await connection.end()
+  }
 })
